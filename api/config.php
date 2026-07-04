@@ -1,5 +1,5 @@
 <?php
-// api/config.php - Configuration de la base de données
+// api/config.php
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -11,13 +11,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-// Paramètres de connexion
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'socialwave_db');
 define('DB_USER', 'root');
 define('DB_PASS', '');
 
-// Connexion à la base
 try {
     $pdo = new PDO(
         "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4",
@@ -35,13 +33,11 @@ try {
     exit();
 }
 
-// Fonction utilitaire pour les réponses JSON
 function jsonResponse($data, $status = 200) {
     http_response_code($status);
     echo json_encode($data, JSON_UNESCAPED_UNICODE);
     exit();
 }
 
-// Démarrer la session PHP (pour garder l'utilisateur connecté)
 session_start();
 ?>

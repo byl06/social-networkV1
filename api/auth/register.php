@@ -3,6 +3,11 @@
 
 require_once '../config.php';
 
+// Désactiver l'affichage des erreurs
+error_reporting(0);
+ini_set('display_errors', 0);
+ob_clean();
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     jsonResponse(['error' => 'Méthode non autorisée'], 405);
 }
@@ -58,9 +63,10 @@ try {
     $stmt->execute([$nom, $prenom, $email, $hashed_password, $token_verification, $bio]);
     $user_id = $pdo->lastInsertId();
     
-    // 🔥 Envoyer l'email de confirmation
+    // Lien de confirmation
     $confirm_link = "http://localhost/social-network/api/auth/verify_email.php?token=" . $token_verification;
     
+    // Envoyer l'email
     $to = $email;
     $subject = "Confirmez votre inscription - SocialWave";
     $headers = "MIME-Version: 1.0" . "\r\n";
@@ -72,53 +78,45 @@ try {
     <html>
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Confirmation d\'inscription</title>
+        <title>Confirmation SocialWave</title>
         <style>
-            body { font-family: Arial, sans-serif; background: #0a0a0f; color: #f0f0f8; margin: 0; padding: 0; }
-            .container { max-width: 500px; margin: 50px auto; background: #12121a; border-radius: 16px; padding: 40px; border: 1px solid rgba(255,255,255,0.08); }
-            .logo { text-align: center; font-size: 28px; font-weight: 700; color: #7c6fff; margin-bottom: 20px; }
-            .title { font-size: 22px; font-weight: 700; text-align: center; margin-bottom: 16px; }
-            .content { color: #8888aa; text-align: center; line-height: 1.6; margin-bottom: 30px; }
-            .btn { display: inline-block; background: #7c6fff; color: white !important; text-decoration: none; padding: 14px 32px; border-radius: 50px; font-weight: 600; font-size: 16px; }
-            .btn:hover { background: #6b5cdb; }
-            .footer { text-align: center; font-size: 12px; color: #555577; margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 20px; }
-            .text-center { text-align: center; }
+            body { font-family: Arial; background: #0a0a0f; color: #f0f0f8; margin: 0; padding: 0; }
+            .container { max-width: 500px; margin: 50px auto; background: #12121a; border-radius: 16px; padding: 40px; border: 1px solid rgba(255,255,255,0.08); text-align: center; }
+            .logo { font-size: 28px; font-weight: 700; color: #7c6fff; margin-bottom: 20px; }
+            .title { font-size: 22px; font-weight: 700; margin-bottom: 16px; }
+            .content { color: #8888aa; line-height: 1.6; margin-bottom: 30px; }
+            .btn { display: inline-block; background: #7c6fff; color: white; text-decoration: none; padding: 14px 32px; border-radius: 50px; font-weight: 600; }
+            .footer { font-size: 12px; color: #555577; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.06); }
         </style>
     </head>
     <body>
         <div class="container">
             <div class="logo">🌊 SocialWave</div>
-            <div class="title">Bienvenue sur SocialWave !</div>
+            <div class="title">Bienvenue ' . htmlspecialchars($prenom) . ' !</div>
             <div class="content">
-                Bonjour <strong>' . htmlspecialchars($prenom) . '</strong>,<br><br>
                 Merci de vous être inscrit sur SocialWave !<br>
-                Pour activer votre compte, veuillez cliquer sur le bouton ci-dessous.
+                Cliquez sur le bouton ci-dessous pour activer votre compte.
             </div>
-            <div class="text-center">
-                <a href="' . $confirm_link . '" class="btn">Confirmer mon inscription</a>
-            </div>
-            <div class="content" style="font-size:12px; color:#555577; margin-top:20px;">
-                Si vous n\'êtes pas à l\'origine de cette inscription, ignorez cet email.
-            </div>
-            <div class="footer">
-                © 2026 SocialWave - Tous droits réservés
-            </div>
+            <a href="' . $confirm_link . '" class="btn">Confirmer mon inscription</a>
+            <div class="footer">© 2026 SocialWave</div>
         </div>
     </body>
     </html>
     ';
     
+    // Envoyer l'email
     mail($to, $subject, $message, $headers);
     
-    jsonResponse([
+    // Réponse JSON (sans debug_link pour éviter les erreurs)
+    echo json_encode([
         'success' => true,
         'message' => 'Inscription réussie ! Un email de confirmation vous a été envoyé.',
-        'user_id' => $user_id,
-        'debug_link' => $confirm_link // Pour le développement
-    ], 201);
+        'user_id' => $user_id
+    ]);
+    exit();
     
 } catch(PDOException $e) {
-    jsonResponse(['error' => 'Erreur lors de l\'inscription : ' . $e->getMessage()], 500);
+    echo json_encode(['error' => 'Erreur lors de l\'inscription'], 500);
+    exit();
 }
 ?>
