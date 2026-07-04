@@ -2329,16 +2329,33 @@ function displayAdminStats(stats) {
 // Charger les utilisateurs pour l'admin
 async function loadAdminUsers() {
     try {
+        console.log('🔍 Chargement des utilisateurs admin...');
         const response = await fetch('http://localhost/social-network/api/admin/get_users.php', {
             credentials: 'include'
         });
-        const data = await response.json();
+        
+        console.log('📊 Statut HTTP:', response.status);
+        const text = await response.text();
+        console.log('📊 Réponse brute:', text.substring(0, 200));
+        
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch(e) {
+            console.error('❌ Erreur parsing JSON:', e);
+            showAlert('❌ Erreur de chargement des utilisateurs');
+            return;
+        }
         
         if (data.success) {
             displayAdminUsers(data.users, data.is_admin);
+        } else {
+            console.error('❌ Erreur chargement utilisateurs:', data.error);
+            showAlert('❌ ' + (data.error || 'Erreur inconnue'));
         }
     } catch (error) {
-        console.error('Erreur:', error);
+        console.error('❌ Erreur loadAdminUsers:', error);
+        showAlert('❌ Erreur de chargement des utilisateurs');
     }
 }
 
@@ -2364,14 +2381,14 @@ function displayAdminUsers(users, isAdmin) {
                 </div>
             </td>
             <td style="padding:13px 20px;">
-                ${isAdmin ? `
-                    <select class="form-input" style="padding:5px 10px; font-size:12px; width:130px;" onchange="updateUserRole(${user.id_user}, this.value)">
-                        <option value="Utilisateur" ${user.role === 'Utilisateur' ? 'selected' : ''}>👤 Utilisateur</option>
-                        <option value="Modérateur" ${user.role === 'Modérateur' ? 'selected' : ''}>🛡️ Modérateur</option>
-                        <option value="Administrateur" ${user.role === 'Administrateur' ? 'selected' : ''}>👑 Administrateur</option>
-                    </select>
-                ` : `<span class="badge ${user.role === 'Administrateur' ? 'badge-purple' : (user.role === 'Modérateur' ? 'badge-green' : '')}">${user.role}</span>`}
-            </td>
+    ${isAdmin ? `
+        <select class="form-input" style="padding:5px 10px; font-size:12px; width:130px;" onchange="updateUserRole(${user.id_user}, this.value)">
+            <option value="Utilisateur" ${user.role === 'Utilisateur' ? 'selected' : ''}>👤 Utilisateur</option>
+            <option value="Modérateur" ${user.role === 'Modérateur' ? 'selected' : ''}>🛡️ Modérateur</option>
+            <option value="Administrateur" ${user.role === 'Administrateur' ? 'selected' : ''}>👑 Administrateur</option>
+        </select>
+    ` : `<span class="badge">${user.role}</span>`}
+</td>
             <td style="padding:13px 20px;">
                 <span class="badge badge-green">${user.statut}</span>
             </td>
@@ -2387,8 +2404,12 @@ function displayAdminUsers(users, isAdmin) {
 }
 
 // Mettre à jour le rôle d'un utilisateur
+// Mettre à jour le rôle d'un utilisateur
+// Mettre à jour le rôle d'un utilisateur
 async function updateUserRole(userId, newRole) {
     try {
+        console.log('📤 Mise à jour du rôle:', userId, '->', newRole);
+        
         const response = await fetch('http://localhost/social-network/api/admin/update_user_role.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -2397,15 +2418,21 @@ async function updateUserRole(userId, newRole) {
         });
         
         const data = await response.json();
+        console.log('📊 Réponse reçue:', data);
         
         if (data.success) {
-            showAlert(`Rôle mis à jour : ${newRole}`);
-            loadAdminUsers(); // Recharger la liste
+            showAlert('✅ ' + data.message);
+            // Recharger la liste des utilisateurs
+            await loadAdminUsers();
+            return true;
         } else {
-            showAlert(data.error || 'Erreur');
+            showAlert('❌ ' + (data.error || 'Erreur inconnue'));
+            return false;
         }
     } catch (error) {
-        showAlert('Erreur de connexion');
+        console.error('❌ Erreur updateUserRole:', error);
+        showAlert('❌ Erreur de connexion au serveur');
+        return false;
     }
 }
 
@@ -2561,12 +2588,210 @@ async function viewUserProfile(userId) {
 }
 
 // Ajouter un modérateur (admin seulement)
+// Ajouter un modérateur (admin seulement)
+// Ajouter un modérateur (admin seulement)
+// Ajouter un modérateur (admin seulement)
+// Ajouter un modérateur (admin seulement)
 function showAddModeratorModal() {
-    // Implémentation simple pour l'instant
-    const email = prompt('Entrez l\'email de l\'utilisateur à promouvoir modérateur:');
-    if (email) {
-        // Chercher l'utilisateur par email et le promouvoir
-        showAlert(`Recherche de l'utilisateur avec l'email: ${email}`);
+    const email = prompt('✏️ Entrez l\'email de l\'utilisateur à promouvoir modérateur :\n(Exemple: fatime@socialwave.com)');
+    
+    if (!email) {
+        showAlert('❌ Opération annulée');
+        return;
+    }
+    
+    if (!email.includes('@')) {
+        showAlert('❌ Email invalide');
+        return;
+    }
+    
+    findUserByEmail(email);
+}
+
+async function findUserByEmail(email) {
+    try {
+        showAlert('🔍 Recherche de l\'utilisateur...');
+        
+        // Utiliser l'API get_users.php qui est déjà disponible
+        const response = await fetch('http://localhost/social-network/api/admin/get_users.php', {
+            credentials: 'include'
+        });
+        const data = await response.json();
+        
+        console.log('📊 Utilisateurs:', data);
+        
+        if (!data.success) {
+            showAlert('❌ Erreur de chargement');
+            return;
+        }
+        
+        // Chercher l'utilisateur par email
+        const user = data.users.find(u => u.email === email);
+        
+        if (!user) {
+            showAlert('❌ Aucun utilisateur trouvé avec l\'email: ' + email);
+            return;
+        }
+        
+        // Vérifier le rôle actuel
+        if (user.role === 'Modérateur') {
+            showAlert('ℹ️ Cet utilisateur est déjà modérateur');
+            return;
+        }
+        
+        if (user.role === 'Administrateur') {
+            showAlert('ℹ️ Cet utilisateur est déjà administrateur');
+            return;
+        }
+        
+        // Demander confirmation
+        if (confirm(`✅ Promouvoir ${user.prenom} ${user.nom} (${user.email}) en tant que MODÉRATEUR ?`)) {
+            const result = await updateUserRole(user.id_user, 'Modérateur');
+            if (result) {
+                showAlert(`✅ ${user.prenom} ${user.nom} est maintenant modérateur !`);
+            }
+        }
+        
+    } catch (error) {
+        console.error('❌ Erreur findUserByEmail:', error);
+        showAlert('❌ Erreur de connexion');
+    }
+}
+
+async function findUserByEmail(email) {
+    try {
+        showAlert('🔍 Recherche de l\'utilisateur...');
+        
+        const response = await fetch('http://localhost/social-network/api/admin/get_users.php', {
+            credentials: 'include'
+        });
+        const data = await response.json();
+        
+        console.log('📊 Utilisateurs reçus:', data);
+        
+        if (!data.success) {
+            showAlert('❌ ' + (data.error || 'Erreur de chargement'));
+            return;
+        }
+        
+        const user = data.users.find(u => u.email === email);
+        
+        if (!user) {
+            showAlert('❌ Utilisateur non trouvé avec l\'email: ' + email);
+            return;
+        }
+        
+        if (user.role === 'Modérateur') {
+            showAlert('ℹ️ Cet utilisateur est déjà modérateur');
+            return;
+        }
+        
+        if (user.role === 'Administrateur') {
+            showAlert('ℹ️ Cet utilisateur est déjà administrateur');
+            return;
+        }
+        
+        if (confirm(`✅ Promouvoir ${user.prenom} ${user.nom} (${user.email}) en tant que MODÉRATEUR ?`)) {
+            // Appeler updateUserRole
+            const result = await updateUserRole(user.id_user, 'Modérateur');
+            if (result) {
+                showAlert(`✅ ${user.prenom} ${user.nom} est maintenant modérateur !`);
+                // Recharger la page admin pour voir le changement
+                await loadAdminUsers();
+            }
+        }
+        
+    } catch (error) {
+        console.error('Erreur:', error);
+        showAlert('❌ Erreur de connexion');
+    }
+}
+
+async function findUserByEmail(email) {
+    try {
+        showAlert('🔍 Recherche de l\'utilisateur...');
+        
+        const response = await fetch('http://localhost/social-network/api/admin/get_users.php', {
+            credentials: 'include'
+        });
+        const data = await response.json();
+        
+        console.log('📊 Utilisateurs reçus:', data);
+        
+        if (!data.success) {
+            showAlert('❌ ' + (data.error || 'Erreur de chargement'));
+            return;
+        }
+        
+        const user = data.users.find(u => u.email === email);
+        
+        if (!user) {
+            showAlert('❌ Utilisateur non trouvé avec l\'email: ' + email);
+            return;
+        }
+        
+        if (user.role === 'Modérateur') {
+            showAlert('ℹ️ Cet utilisateur est déjà modérateur');
+            return;
+        }
+        
+        if (user.role === 'Administrateur') {
+            showAlert('ℹ️ Cet utilisateur est déjà administrateur');
+            return;
+        }
+        
+        if (confirm(`✅ Promouvoir ${user.prenom} ${user.nom} (${user.email}) en tant que MODÉRATEUR ?`)) {
+            await updateUserRole(user.id_user, 'Modérateur');
+        }
+        
+    } catch (error) {
+        console.error('Erreur:', error);
+        showAlert('❌ Erreur de connexion');
+    }
+}
+
+async function findUserByEmail(email) {
+    try {
+        showAlert('🔍 Recherche de l\'utilisateur...');
+        
+        // D'abord, récupérer tous les utilisateurs
+        const response = await fetch('http://localhost/social-network/api/admin/get_users.php', {
+            credentials: 'include'
+        });
+        const data = await response.json();
+        
+        if (!data.success) {
+            showAlert('❌ ' + (data.error || 'Erreur de chargement'));
+            return;
+        }
+        
+        // Trouver l'utilisateur par email
+        const user = data.users.find(u => u.email === email);
+        
+        if (!user) {
+            showAlert('❌ Utilisateur non trouvé avec l\'email: ' + email);
+            return;
+        }
+        
+        // Vérifier si l'utilisateur n'est pas déjà modérateur ou admin
+        if (user.role === 'Modérateur') {
+            showAlert('ℹ️ Cet utilisateur est déjà modérateur');
+            return;
+        }
+        
+        if (user.role === 'Administrateur') {
+            showAlert('ℹ️ Cet utilisateur est déjà administrateur');
+            return;
+        }
+        
+        // Confirmer avant de promouvoir
+        if (confirm(`✅ Êtes-vous sûr de vouloir promouvoir ${user.prenom} ${user.nom} (${user.email}) en tant que MODÉRATEUR ?`)) {
+            await updateUserRole(user.id_user, 'Modérateur');
+        }
+        
+    } catch (error) {
+        console.error('Erreur:', error);
+        showAlert('❌ Erreur de connexion');
     }
 }
 
@@ -2823,37 +3048,27 @@ async function loadProfile() {
 }
 
 async function loadProfileStats(userId) {
+    if (!userId) {
+        console.warn('⚠️ userId undefined, utilisateur par défaut');
+        userId = currentUser?.id_user || 1;
+    }
+    
     try {
         const response = await fetch(`http://localhost/social-network/api/profile/get_stats.php?user_id=${userId}`, {
             credentials: 'include'
         });
         const data = await response.json();
         
-        console.log('📊 Stats profil reçues:', data);
-        
         if (data.success) {
-            // Chercher les 3 cartes de statistiques
+            // Mettre à jour les stats du profil
             const statValues = document.querySelectorAll('#profilePage .profile-info-card > div > div > div:first-child');
-            
             if (statValues.length >= 3) {
                 statValues[0].textContent = data.stats.posts_count;
                 statValues[1].textContent = data.stats.friends_count;
                 statValues[2].textContent = data.stats.followers_count;
-            } else {
-                // Fallback: chercher autrement
-                const allDivs = document.querySelectorAll('#profilePage .profile-info-card > div > div');
-                if (allDivs.length >= 3) {
-                    const postDiv = allDivs[0].querySelector('div:first-child');
-                    const friendsDiv = allDivs[1].querySelector('div:first-child');
-                    const likesDiv = allDivs[2].querySelector('div:first-child');
-                    
-                    if (postDiv) postDiv.textContent = data.stats.posts_count;
-                    if (friendsDiv) friendsDiv.textContent = data.stats.friends_count;
-                    if (likesDiv) likesDiv.textContent = data.stats.followers_count;
-                }
             }
         }
     } catch (error) {
-        console.error('Erreur loadProfileStats:', error);
+        console.error('Erreur stats:', error);
     }
 }
