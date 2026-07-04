@@ -71,6 +71,9 @@ async function handleLogin() {
 
 // Inscription
 // Inscription
+// Inscription
+// Inscription
+// Inscription
 async function handleRegister() {
     const prenom = document.getElementById('signupPrenom').value;
     const nom = document.getElementById('signupNom').value;
@@ -80,6 +83,7 @@ async function handleRegister() {
     const errorDiv = document.getElementById('signupError');
     
     errorDiv.style.display = 'none';
+    errorDiv.style.color = '#ff5577';
     
     if (!prenom || !nom || !email || !password || !confirm) {
         errorDiv.style.display = 'block';
@@ -116,31 +120,18 @@ async function handleRegister() {
         console.log('📧 Réponse inscription:', data);
         
         if (data.success) {
-            // ✅ NOUVEAU MESSAGE AVEC CONFIRMATION EMAIL
-            showAlert('✅ Inscription réussie ! Un email de confirmation vous a été envoyé.');
-            
-            // Basculer vers l'onglet connexion
-            setAuthTab('login');
-            document.getElementById('loginEmail').value = email;
-            
-            // Vider les champs
-            document.getElementById('signupPrenom').value = '';
-            document.getElementById('signupNom').value = '';
-            document.getElementById('signupEmail').value = '';
-            document.getElementById('signupPassword').value = '';
-            document.getElementById('signupConfirm').value = '';
-            
-            // Afficher le lien de confirmation dans la console (pour le développement)
-            if (data.debug_link) {
-                console.log('🔗 Lien de confirmation:', data.debug_link);
-            }
+            // Rediriger vers la page de confirmation
+            const confirmUrl = `vues/clients/confirm.html?email=${encodeURIComponent(email)}&link=${encodeURIComponent(data.debug_link)}&token=${data.token}`;
+            window.location.href = confirmUrl;
         } else {
             errorDiv.style.display = 'block';
+            errorDiv.style.color = '#ff5577';
             errorDiv.textContent = data.error || 'Erreur lors de l\'inscription';
         }
     } catch (error) {
         console.error('Erreur:', error);
         errorDiv.style.display = 'block';
+        errorDiv.style.color = '#ff5577';
         errorDiv.textContent = 'Erreur de connexion au serveur';
     }
 }
@@ -704,10 +695,20 @@ function showMainApp() {
     updateRightPanel();
 }
 
+// Afficher un onglet d'authentification
 function setAuthTab(tab) {
     const tabs = document.querySelectorAll('#authTabs .tab');
     tabs.forEach(t => t.classList.remove('active'));
-    event.target.classList.add('active');
+    
+    // Trouver le tab correspondant
+    tabs.forEach(t => {
+        const text = t.textContent.trim().toLowerCase();
+        if ((tab === 'login' && text === 'connexion') || 
+            (tab === 'signup' && text === 'inscription') ||
+            (tab === 'forgot' && text === 'mot de passe')) {
+            t.classList.add('active');
+        }
+    });
     
     document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
     document.getElementById('signupForm').style.display = tab === 'signup' ? 'block' : 'none';

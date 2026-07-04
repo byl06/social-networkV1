@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmation - SocialWave</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0f;
+            color: #f0f0f8;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(124,111,255,0.15) 0%, transparent 70%);
+            top: -200px;
+            right: -100px;
+            animation: float 6s ease-in-out infinite;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(16,217,140,0.1) 0%, transparent 70%);
+            bottom: -100px;
+            left: -100px;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(30px, -30px) scale(1.1); }
+        }
+        .card {
+            background: rgba(255,255,255,0.04);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 24px;
+            padding: 50px 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            animation: slideUp 0.6s ease;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .icon-wrapper {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 24px;
+            background: linear-gradient(135deg, rgba(16,217,140,0.2), rgba(124,111,255,0.2));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            animation: pulse 2s ease-in-out infinite;
+            border: 2px solid rgba(16,217,140,0.3);
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16,217,140,0.3); }
+            50% { transform: scale(1.05); box-shadow: 0 0 40px 10px rgba(16,217,140,0.15); }
+        }
+        .logo {
+            font-family: 'Sora', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: #7c6fff;
+            margin-bottom: 8px;
+        }
+        h1 {
+            font-family: 'Sora', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #10d98c;
+        }
+        .subtitle {
+            color: #8888aa;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+        .email-display {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin: 16px 0 20px;
+            font-size: 14px;
+            color: #aaaacc;
+            border: 1px solid rgba(255,255,255,0.06);
+            word-break: break-all;
+        }
+        .email-display strong { color: #f0f0f8; }
+        .link-box {
+            background: rgba(255,255,255,0.04);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin: 16px 0 24px;
+            border: 1px solid rgba(124,111,255,0.2);
+            word-break: break-all;
+            font-size: 13px;
+            color: #8888aa;
+            position: relative;
+        }
+        .link-box a {
+            color: #7c6fff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .link-box a:hover { text-decoration: underline; color: #a78bfa; }
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #7c6fff, #6b5cdb);
+            color: white;
+            padding: 14px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(124,111,255,0.4);
+        }
+        .btn-secondary {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 12px 28px;
+            margin-top: 12px;
+            font-size: 13px;
+            display: inline-block;
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.14); }
+        .steps {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 20px 0 16px;
+        }
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #555577;
+        }
+        .step .num {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 11px;
+            color: #8888aa;
+        }
+        .step.active .num { background: #7c6fff; color: white; }
+        .step.active { color: #aaaacc; }
+        .step.done .num { background: #10d98c; color: white; }
+        .footer {
+            margin-top: 24px;
+            font-size: 12px;
+            color: #444466;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 20px;
+        }
+        .copy-btn {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 4px 12px;
+            color: #8888aa;
+            font-size: 11px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-left: 8px;
+        }
+        .copy-btn:hover {
+            background: rgba(255,255,255,0.12);
+            color: #f0f0f8;
+        }
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(16,217,140,0.2);
+            border: 1px solid rgba(16,217,140,0.3);
+            color: #10d98c;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.4s ease;
+            pointer-events: none;
+            z-index: 999;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toast" id="toast">✅ Lien copié dans le presse-papiers</div>
+
+    <div class="card">
+        <div class="icon-wrapper">📧</div>
+        <div class="logo">🌊 SocialWave</div>
+        <h1>Vérifiez votre email</h1>
+        <p class="subtitle">Un email de confirmation a été envoyé à :</p>
+        <div class="email-display" id="userEmail"><strong>---</strong></div>
+
+        <div class="steps">
+            <div class="step done"><span class="num">✓</span> Inscription</div>
+            <div class="step active"><span class="num">2</span> Confirmation</div>
+            <div class="step"><span class="num">3</span> Connexion</div>
+        </div>
+
+        <p style="color:#8888aa;font-size:13px;margin-bottom:8px;">
+            📧 Cliquez sur le lien ci-dessous pour activer votre compte :
+        </p>
+
+        <div class="link-box">
+            <a href="#" id="confirmLink" target="_blank">Chargement du lien...</a>
+            <button class="copy-btn" onclick="copyLink()">📋 Copier</button>
+        </div>
+
+        <a href="#" id="confirmBtn" class="btn">📧 Activer mon compte</a>
+        <br>
+        <a href="../../index.html" class="btn btn-secondary">← Retour à la connexion</a>
+
+        <div class="footer">© 2026 SocialWave — Un email vous a été envoyé.</div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const email = urlParams.get('email');
+        const link = urlParams.get('link');
+        const token = urlParams.get('token');
+
+        if (email) {
+            document.getElementById('userEmail').innerHTML = `<strong>${decodeURIComponent(email)}</strong>`;
+        }
+
+        let confirmLink = link || `http://localhost/social-network/api/auth/verify_email.php?token=${token}`;
+
+        if (confirmLink) {
+            document.getElementById('confirmLink').href = confirmLink;
+            document.getElementById('confirmLink').textContent = confirmLink;
+            document.getElementById('confirmBtn').href = confirmLink;
+        }
+
+        function copyLink() {
+            const link = document.getElementById('confirmLink').href;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(link).then(() => showToast('✅ Lien copié dans le presse-papiers'));
+            } else {
+                const input = document.createElement('input');
+                input.value = link;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                input.remove();
+                showToast('✅ Lien copié dans le presse-papiers');
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Redirection automatique vers la connexion après 20 secondes
+        setTimeout(() => {
+            window.location.href = '../../index.html';
+        }, 20000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocialWave</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background: #0a0a0f;
+            color: #f0f0f8;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Fond animé */
+        body::before {
+            content: '';
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(124,111,255,0.15) 0%, transparent 70%);
+            top: -200px;
+            right: -100px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(16,217,140,0.1) 0%, transparent 70%);
+            bottom: -100px;
+            left: -100px;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+            50% {
+                transform: translate(30px, -30px) scale(1.1);
+            }
+        }
+
+        .container {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .logo-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #7c6fff, #a78bfa);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            margin: 0 auto 24px;
+            box-shadow: 0 8px 40px rgba(124,111,255,0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                box-shadow: 0 8px 40px rgba(124,111,255,0.3);
+            }
+            50% {
+                box-shadow: 0 8px 60px rgba(124,111,255,0.6);
+            }
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #7c6fff, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #8888aa;
+            font-size: 16px;
+            margin-bottom: 32px;
+        }
+
+        /* Spinner */
+        .spinner {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .spinner span {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #7c6fff;
+            animation: bounce 1.4s ease-in-out infinite both;
+        }
+
+        .spinner span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+        .spinner span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+        .spinner span:nth-child(3) {
+            animation-delay: 0;
+        }
+
+        @keyframes bounce {
+            0%,
+            80%,
+            100% {
+                transform: scale(0);
+                opacity: 0.3;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .loading-text {
+            font-size: 13px;
+            color: #555577;
+            letter-spacing: 0.1em;
+        }
+
+        .progress-bar {
+            width: 200px;
+            height: 3px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 3px;
+            margin: 16px auto 0;
+            overflow: hidden;
+        }
+
+        .progress-bar .fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #7c6fff, #a78bfa);
+            border-radius: 3px;
+            animation: progress 2s ease forwards;
+        }
+
+        @keyframes progress {
+            0% {
+                width: 0%;
+            }
+            100% {
+                width: 100%;
+            }
+        }
+
+        .social-text {
+            margin-top: 32px;
+            font-size: 12px;
+            color: #333355;
+            letter-spacing: 0.05em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-icon">🌊</div>
+        <h1>SocialWave</h1>
+        <p class="subtitle">Votre compte est en cours de création...</p>
+
+        <div class="spinner">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <div class="progress-bar">
+            <div class="fill"></div>
+        </div>
+
+        <p class="loading-text">Préparation de votre espace</p>
+        <div class="social-text">© 2026 — SocialWave</div>
+    </div>
+
+    <script>
+        // Récupérer les paramètres de l'URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const email = urlParams.get('email');
+        const link = urlParams.get('link');
+        const token = urlParams.get('token');
+
+        // Attendre 2.5 secondes puis rediriger vers confirm.html
+        setTimeout(() => {
+            let confirmUrl = `confirm.html?email=${encodeURIComponent(email)}&link=${encodeURIComponent(link)}&token=${token}`;
+            window.location.href = confirmUrl;
+        }, 2500);
+    </script>
+</body>
+</html>

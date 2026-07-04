@@ -11,10 +11,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
+// Paramètres de connexion - VÉRIFIE CES INFOS
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'socialwave_db');
+define('DB_NAME', 'socialwave_db');  // Vérifie le nom de ta base
 define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_PASS', '');  // Laisse vide si pas de mot de passe
 
 try {
     $pdo = new PDO(
@@ -28,8 +29,9 @@ try {
         ]
     );
 } catch(PDOException $e) {
+    // Afficher l'erreur réelle pour le débogage
     http_response_code(500);
-    echo json_encode(['error' => 'Erreur de connexion à la base de données']);
+    echo json_encode(['error' => 'Erreur de connexion: ' . $e->getMessage()]);
     exit();
 }
 
