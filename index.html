@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SocialWave — Réseau Social</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<!-- ─── AUTH PAGE (shown first) ─── -->
+<!-- AUTH PAGE (modifiée) -->
+<div id="authPage" style="width:100%; position:fixed; inset:0; z-index:999; display:flex;">
+  <div class="auth-bg" style="width:100%; flex-direction:column;">
+    <div class="auth-orb1"></div>
+    <div class="auth-orb2"></div>
+    <div class="auth-card">
+      <div style="text-align:center; margin-bottom:32px;">
+        <div class="logo-icon" style="width:52px;height:52px;margin:0 auto 16px; font-size:26px; border-radius:14px;">🌊</div>
+        <h1 style="font-family:'Sora',sans-serif; font-size:26px; font-weight:700; margin-bottom:6px;">SocialWave</h1>
+        <p style="color:var(--text2); font-size:14px;">Rejoignez la communauté</p>
+      </div>
+
+      <div id="authTabs" class="tab-bar">
+        <div class="tab active" onclick="setAuthTab('login')">Connexion</div>
+        <div class="tab" onclick="setAuthTab('signup')">Inscription</div>
+      </div>
+
+      <div id="loginForm">
+        <div id="loginError" style="background:rgba(255,85,119,0.15); border:1px solid #ff5577; border-radius:10px; padding:10px; margin-bottom:15px; font-size:13px; display:none;"></div>
+        <div class="form-group">
+          <label class="form-label">Adresse email</label>
+          <input class="form-input" type="email" id="loginEmail" placeholder="vous@exemple.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mot de passe</label>
+          <input class="form-input" type="password" id="loginPassword" placeholder="••••••••">
+        </div>
+        <div style="text-align:right; margin:-8px 0 18px;">
+    <span style="font-size:13px; color:var(--accent2); cursor:pointer;" onclick="showForgotForm()">Mot de passe oublié ?</span>
+</div>
+        <button class="glass-btn primary" style="width:100%; justify-content:center; padding:13px;" onclick="handleLogin()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10,17 15,12 10,7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          Se connecter
+        </button>
+      </div>
+
+      <div id="signupForm" style="display:none;">
+        <div id="signupError" style="background:rgba(255,85,119,0.15); border:1px solid #ff5577; border-radius:10px; padding:10px; margin-bottom:15px; font-size:13px; display:none;"></div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="form-group"><label class="form-label">Prénom</label><input class="form-input" id="signupPrenom" placeholder="Prénom"></div>
+          <div class="form-group"><label class="form-label">Nom</label><input class="form-input" id="signupNom" placeholder="Nom"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="signupEmail" placeholder="vous@exemple.com"></div>
+        <div class="form-group"><label class="form-label">Mot de passe</label><input class="form-input" type="password" id="signupPassword" placeholder="••••••••"></div>
+        <div class="form-group"><label class="form-label">Confirmer le mot de passe</label><input class="form-input" type="password" id="signupConfirm" placeholder="••••••••"></div>
+        <button class="glass-btn primary" style="width:100%; justify-content:center; padding:13px;" onclick="handleRegister()">
+          Créer mon compte
+        </button>
+      </div>
+      <div id="forgotForm" style="display:none;">
+    <div id="forgotError" style="background:rgba(255,85,119,0.15); border:1px solid #ff5577; border-radius:10px; padding:10px; margin-bottom:15px; font-size:13px; display:none;"></div>
+    <div id="forgotSuccess" style="background:rgba(16,217,140,0.15); border:1px solid #10d98c; border-radius:10px; padding:10px; margin-bottom:15px; font-size:13px; display:none;"></div>
+    
+    <div class="form-group">
+        <label class="form-label">Adresse email</label>
+        <input class="form-input" type="email" id="forgotEmail" placeholder="votre@email.com">
+    </div>
+    
+    <button class="glass-btn primary" style="width:100%; justify-content:center; padding:13px;" onclick="handleForgotPassword()">
+        Envoyer le lien de réinitialisation
+    </button>
+    
+    <div style="text-align:center; margin-top:16px;">
+        <span style="font-size:13px; color:var(--accent2); cursor:pointer;" onclick="setAuthTab('login')">
+            ← Retour à la connexion
+        </span>
+    </div>
+</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SIDEBAR ─── -->
+<nav class="sidebar" id="sidebar" style="display:none;">
+  <div class="logo">
+    <div class="logo-icon">🌊</div>
+    <span>SocialWave</span>
+  </div>
+
+  <div class="nav-section-label"><span>Navigation</span></div>
+
+  <a class="nav-item active" onclick="showPage('feed')" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    <span>Fil d'actualité</span>
+  </a>
+
+  <a class="nav-item" onclick="showPage('friends')" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    <span>Amis</span>
+    <span class="nav-badge">3</span>
+  </a>
+
+  <a class="nav-item" onclick="showPage('chat')" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <span>Messages</span>
+    <span class="nav-badge" id="chatUnreadBadge" style="display:none;">0</span>
+</a>
+
+  <a class="nav-item" onclick="showPage('profile')" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>Profil</span>
+  </a>
+
+  <a class="nav-item" onclick="showPage('notifications')" href="#">
+    <div class="notif-pill" style="display:inline-flex; position:relative;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notif-dot" style="display:none;"></span>
+    </div>
+    <span>Notifications</span>
+    <span class="nav-badge notif-count" style="display:none; margin-left:auto;">0</span>
+</a>
+
+  <div class="nav-section-label" style="margin-top:12px;"><span>Admin</span></div>
+
+  <a class="nav-item" onclick="showPage('admin')" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+    <span>Back Office</span>
+  </a>
+
+  <div class="sidebar-footer">
+  <div class="user-pill" onclick="logout()">
+    <div class="avatar-fallback" id="sidebarAvatar" style="width:34px;height:34px;background:linear-gradient(135deg,var(--accent),#10d98c);font-size:13px;color:white;flex-shrink:0;">?</div>
+    <div style="flex:1; overflow:hidden;">
+      <div style="font-size:13.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><span id="sidebarNom">Chargement...</span></div>
+      <div style="font-size:11.5px;color:var(--text2);"><span id="sidebarEmail">@user</span></div>
+    </div>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text2);flex-shrink:0;" class="logout-icon"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+  </div>
+</div>
+</nav>
+
+<!-- ─── MAIN AREA ─── -->
+<div class="main" id="mainArea" style="display:none;">
+
+  <!-- ══ FEED PAGE ══ -->
+  <div class="feed-area">
+    <div id="feedPage" class="page active">
+      <!-- Topbar -->
+      <div class="topbar">
+        <h2 style="font-family:'Sora',sans-serif;font-size:20px;font-weight:700;">Fil d'actualité</h2>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <div class="search-box">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input placeholder="Rechercher des amis..." id="searchInput" onkeyup="handleSearch(event)">
+</div>
+          <button class="icon-btn" onclick="openChatFromTopbar()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+</button>
+        </div>
+      </div>
+
+      <!-- Stories -->
+      <div class="stories">
+        <div class="story add-story">
+          <div class="story-ring">
+            <div class="story-ring-inner">➕</div>
+          </div>
+          <span class="story-label">Ma story</span>
+        </div>
+        <div class="story" onclick="showAlert('Story de Fatime')">
+          <div class="story-ring">
+            <div class="story-ring-inner">👩🏾</div>
+          </div>
+          <span class="story-label">Fatime</span>
+        </div>
+        <div class="story">
+          <div class="story-ring">
+            <div class="story-ring-inner">👨🏽</div>
+          </div>
+          <span class="story-label">Marcus</span>
+        </div>
+        <div class="story">
+          <div class="story-ring">
+            <div class="story-ring-inner">🧑🏻</div>
+          </div>
+          <span class="story-label">Léa</span>
+        </div>
+        <div class="story">
+          <div class="story-ring seen">
+            <div class="story-ring-inner">👩🏽</div>
+          </div>
+          <span class="story-label">Ines</span>
+        </div>
+        <div class="story">
+          <div class="story-ring seen">
+            <div class="story-ring-inner">🧑🏿</div>
+          </div>
+          <span class="story-label">Samuel</span>
+        </div>
+      </div>
+
+      <!-- Composer -->
+      <div class="composer">
+    <div class="composer-row">
+        <div class="avatar-fallback" style="width:40px;height:40px;background:linear-gradient(135deg,var(--accent),#10d98c);font-size:13px;color:white;">KA</div>
+        <textarea class="composer-input" placeholder="Quoi de neuf, Koffi ?" rows="2" id="newPostText"></textarea>
+    </div>
+    <div class="composer-actions">
+        <button class="icon-btn" title="Photo" onclick="openImageUploader()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+        </button>
+        <button class="icon-btn" title="Vidéo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23,7 16,12 23,17"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+        </button>
+        <button class="icon-btn" title="Emoji">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+        </button>
+        <button class="glass-btn primary" style="margin-left:auto; padding:8px 20px;" onclick="publishPost()">
+            Publier
+        </button>
+    </div>
+</div>
+
+      <!-- Posts -->
+      <div id="postsContainer">
+
+        <!-- Post 1 -->
+        <div class="post" id="post1">
+          <div class="post-header">
+            <div class="avatar-fallback" style="width:42px;height:42px;background:linear-gradient(135deg,#ff9966,#ff5577);font-size:14px;color:white;">FM</div>
+            <div class="post-meta">
+              <div class="post-name">Fatime Maïdoukou</div>
+              <div class="post-time">il y a 23 min · 🌍 Public</div>
+            </div>
+            <button class="icon-btn" style="width:32px;height:32px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+            </button>
+          </div>
+          <div class="post-body">
+            <p class="post-text">Magnifique coucher de soleil ce soir depuis Cotonou 🌅 La vie est belle quand on prend le temps de s'arrêter et d'apprécier. Bonne soirée à tous ! ✨</p>
+            <div class="post-image" style="border-radius:0;">🌅</div>
+          </div>
+          <div style="padding:10px 18px;display:flex;gap:6px;flex-wrap:wrap;">
+            <span style="background:rgba(255,85,119,0.12);border:1px solid rgba(255,85,119,0.25);color:#ff5577;font-size:12px;padding:3px 10px;border-radius:20px;">❤️ 47</span>
+            <span style="background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--text2);font-size:12px;padding:3px 10px;border-radius:20px;">💬 12 commentaires</span>
+          </div>
+          <div class="post-actions">
+            <button class="action-btn liked" id="like-p1" onclick="toggleLike('p1')">
+              <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              J'aime
+            </button>
+            <button class="action-btn" onclick="toggleComments('c1')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              Commenter
+            </button>
+            <button class="action-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              Partager
+            </button>
+          </div>
+          <div class="comments-section" id="c1">
+            <div class="comment">
+              <div class="avatar-fallback" style="width:30px;height:30px;font-size:11px;background:linear-gradient(135deg,var(--accent),#10d98c);color:white;flex-shrink:0;">MK</div>
+              <div class="comment-bubble"><div class="comment-author">Marcus Kpènou</div><div class="comment-text">Trop belle cette photo 😍</div></div>
+            </div>
+            <div class="comment">
+              <div class="avatar-fallback" style="width:30px;height:30px;font-size:11px;background:linear-gradient(135deg,#ff9966,#ff5577);color:white;flex-shrink:0;">LA</div>
+              <div class="comment-bubble"><div class="comment-author">Léa Azondé</div><div class="comment-text">C'est magnifique ! Où exactement ?</div></div>
+            </div>
+            <div class="comment-input-row">
+              <div class="avatar-fallback" style="width:30px;height:30px;font-size:11px;background:linear-gradient(135deg,var(--accent),#10d98c);color:white;flex-shrink:0;">KA</div>
+              <input class="comment-field" placeholder="Écrire un commentaire..." onkeydown="handleComment(event, 'c1')">
+              <button class="icon-btn" style="width:32px;height:32px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Post 2 -->
+        <div class="post" id="post2">
+          <div class="post-header">
+            <div class="avatar-fallback" style="width:42px;height:42px;background:linear-gradient(135deg,#00c6ff,#0072ff);font-size:14px;color:white;">MK</div>
+            <div class="post-meta">
+              <div class="post-name">Marcus Kpènou</div>
+              <div class="post-time">il y a 1h · 🔒 Amis seulement</div>
+            </div>
+            <button class="icon-btn" style="width:32px;height:32px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+            </button>
+          </div>
+          <div class="post-body">
+            <p class="post-text">Vient de terminer la lecture de "L'Art de la Guerre" de Sun Tzu pour la 3ème fois. Chaque lecture révèle de nouvelles perspectives. La stratégie n'est pas réservée aux guerriers, elle s'applique dans tous les domaines de la vie 📚</p>
+          </div>
+          <div style="padding:10px 18px;display:flex;gap:6px;">
+            <span style="background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--text2);font-size:12px;padding:3px 10px;border-radius:20px;">❤️ 23 · 👍 8</span>
+          </div>
+          <div class="post-actions">
+            <button class="action-btn" id="like-p2" onclick="toggleLike('p2')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              J'aime
+            </button>
+            <button class="action-btn" onclick="toggleComments('c2')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              Commenter
+            </button>
+            <button class="action-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              Partager
+            </button>
+          </div>
+          <div class="comments-section" id="c2">
+            <div class="comment-input-row">
+              <div class="avatar-fallback" style="width:30px;height:30px;font-size:11px;background:linear-gradient(135deg,var(--accent),#10d98c);color:white;flex-shrink:0;">KA</div>
+              <input class="comment-field" placeholder="Écrire un commentaire..." onkeydown="handleComment(event, 'c2')">
+              <button class="icon-btn" style="width:32px;height:32px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /postsContainer -->
+    </div><!-- /feedPage -->
+
+    <!-- ══ FRIENDS PAGE ══ -->
+    <div id="friendsPage" class="page">
+      <div class="topbar">
+        <h2 style="font-family:'Sora',sans-serif;font-size:20px;font-weight:700;">Amis & Communauté</h2>
+      </div>
+
+      <div class="tab-bar" style="max-width:480px;">
+        <div class="tab active" onclick="setFriendTab(this, 'requests')">Invitations <span class="nav-badge" style="position:static;display:inline-block;margin-left:4px;">3</span></div>
+        <div class="tab" onclick="setFriendTab(this, 'discover')">Découvrir</div>
+        <div class="tab" onclick="setFriendTab(this, 'myfriends')">Mes amis</div>
+      </div>
+
+      <div id="requests">
+        <div class="friend-card">
+          <div class="avatar-fallback" style="width:50px;height:50px;background:linear-gradient(135deg,#f7971e,#ffd200);font-size:16px;color:white;">SC</div>
+          <div style="flex:1;">
+            <div style="font-weight:600;font-size:15px;">Séraphine Coulibaly</div>
+            <div style="font-size:12.5px;color:var(--text2);margin:3px 0;">3 amis en commun · Lomé</div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="glass-btn primary" style="padding:8px 16px;" onclick="showAlert('Invitation acceptée !')">Accepter</button>
+            <button class="glass-btn" style="padding:8px 16px;" onclick="this.closest('.friend-card').remove()">Refuser</button>
+          </div>
+        </div>
+        <div class="friend-card" style="animation-delay:.08s;">
+          <div class="avatar-fallback" style="width:50px;height:50px;background:linear-gradient(135deg,#43e97b,#38f9d7);font-size:16px;color:white;">YB</div>
+          <div style="flex:1;">
+            <div style="font-weight:600;font-size:15px;">Yannick Bello</div>
+            <div style="font-size:12.5px;color:var(--text2);margin:3px 0;">1 ami en commun · Abidjan</div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="glass-btn primary" style="padding:8px 16px;" onclick="showAlert('Invitation acceptée !')">Accepter</button>
+            <button class="glass-btn" style="padding:8px 16px;" onclick="this.closest('.friend-card').remove()">Refuser</button>
+          </div>
+        </div>
+        <div class="friend-card" style="animation-delay:.16s;">
+          <div class="avatar-fallback" style="width:50px;height:50px;background:linear-gradient(135deg,#ee0979,#ff6a00);font-size:16px;color:white;">NF</div>
+          <div style="flex:1;">
+            <div style="font-weight:600;font-size:15px;">Nina Fofana</div>
+            <div style="font-size:12.5px;color:var(--text2);margin:3px 0;">7 amis en commun · Dakar</div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="glass-btn primary" style="padding:8px 16px;" onclick="showAlert('Invitation acceptée !')">Accepter</button>
+            <button class="glass-btn" style="padding:8px 16px;" onclick="this.closest('.friend-card').remove()">Refuser</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="discover" style="display:none;">
+        <p style="color:var(--text2);font-size:14px;margin-bottom:16px;">Personnes que vous pourriez connaître</p>
+        <div class="friend-card">
+          <div class="avatar-fallback" style="width:50px;height:50px;background:linear-gradient(135deg,#a18cd1,#fbc2eb);font-size:16px;color:white;">KT</div>
+          <div style="flex:1;"><div style="font-weight:600;font-size:15px;">Kossiwa Tossou</div><div style="font-size:12.5px;color:var(--text2);">5 amis en commun</div></div>
+          <button class="glass-btn primary" style="padding:8px 16px;" onclick="showAlert('Invitation envoyée !')">+ Ajouter</button>
+        </div>
+        <div class="friend-card" style="animation-delay:.08s;">
+          <div class="avatar-fallback" style="width:50px;height:50px;background:linear-gradient(135deg,#667eea,#764ba2);font-size:16px;color:white;">AD</div>
+          <div style="flex:1;"><div style="font-weight:600;font-size:15px;">Amed Diallo</div><div style="font-size:12.5px;color:var(--text2);">2 amis en commun</div></div>
+          <button class="glass-btn primary" style="padding:8px 16px;" onclick="showAlert('Invitation envoyée !')">+ Ajouter</button>
+        </div>
+      </div>
+
+      <div id="myfriends" style="display:none;">
+        <p style="color:var(--text2);font-size:14px;margin-bottom:16px;">Vos amis (28)</p>
+        <div class="friend-card">
+          <div class="avatar-fallback" style="width:50px;height:50px;background:linear-gradient(135deg,#ff9966,#ff5577);font-size:16px;color:white;">FM</div>
+          <div style="flex:1;"><div style="font-weight:600;font-size:15px;">Fatime Maïdoukou</div><div style="font-size:12.5px;color:var(--text2);">🟢 En ligne</div></div>
+          <button class="glass-btn" style="padding:8px 16px;" onclick="toggleChat()">Message</button>
+        </div>
+        <div class="friend-card" style="animation-delay:.08s;">
+          <div class="avatar-fallback" style="width:50px;height:50px;background:linear-gradient(135deg,#00c6ff,#0072ff);font-size:16px;color:white;">MK</div>
+          <div style="flex:1;"><div style="font-weight:600;font-size:15px;">Marcus Kpènou</div><div style="font-size:12.5px;color:var(--text2);">🔴 Hors ligne</div></div>
+          <button class="glass-btn" style="padding:8px 16px;" onclick="toggleChat()">Message</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CHAT PAGE ══ -->
+    <div id="chatPage" class="page">
+    <div class="topbar">
+        <h2 style="font-family:'Sora',sans-serif;font-size:20px;font-weight:700;">Messages</h2>
+        <button class="glass-btn primary" style="padding:8px 18px;" onclick="showAlert('Rechercher un ami')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nouvelle conversation
+        </button>
+    </div>
+    <div style="display:grid;grid-template-columns:280px 1fr;gap:16px;height:calc(100vh - 120px);max-height:600px;">
+        <!-- Sidebar conversations -->
+        <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;">
+            <div style="padding:14px;">
+                <div class="search-box" style="width:100%;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--text2);flex-shrink:0;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input placeholder="Rechercher une conversation..." style="width:100%;" id="searchConversation">
+                </div>
+            </div>
+            <div style="flex:1;overflow-y:auto;" class="sidebar-conversations" id="sidebarConversations">
+                <!-- Les conversations seront chargées ici -->
+            </div>
+        </div>
+        <!-- Fenêtre de conversation -->
+        <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column;overflow:hidden;" id="convWindow">
+            <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;">
+                <div class="avatar-fallback" id="convAvatar" style="width:38px;height:38px;background:linear-gradient(135deg,var(--accent),#10d98c);font-size:13px;color:white;">?</div>
+                <div>
+                    <div style="font-weight:600;font-size:15px;" id="convName">Sélectionnez une conversation</div>
+                    <div style="font-size:12px;color:var(--text2);">Cliquez sur un ami pour discuter</div>
+                </div>
+            </div>
+            <div style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;" id="convMessages">
+                <div style="text-align:center; padding:20px; color:var(--text2);">👈 Sélectionnez une conversation pour commencer</div>
+            </div>
+            <div style="padding:12px;border-top:1px solid var(--border);display:flex;gap:8px;">
+                <button class="icon-btn" onclick="showAlert('Envoi d\'image à venir')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+                </button>
+                <input class="chat-input" placeholder="Écrire un message..." id="chatInlineInput" onkeypress="if(event.key === 'Enter') sendMessage()" style="flex:1;border-radius:50px;padding:9px 16px;">
+                <button class="glass-btn primary" style="padding:8px 14px;" onclick="sendMessage()">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- ══ PROFILE PAGE ══ -->
+    <div id="profilePage" class="page">
+      <div class="profile-banner">
+        <div class="profile-avatar-wrap">
+    <div class="avatar-fallback" id="profilePageAvatar" style="width:88px;height:88px;font-size:28px;font-weight:700;background:linear-gradient(135deg,var(--accent),#10d98c);color:white;border:4px solid var(--bg);display:flex;align-items:center;justify-content:center;border-radius:50%;background-size:cover !important;background-position:center !important;">
+        ?
+    </div>
+</div>
+      </div>
+      <div class="profile-info-card">
+       <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+        <div>
+            <h2 style="font-family:'Sora',sans-serif; font-size:24px; font-weight:700; margin-bottom:4px;">Koffi Agban</h2>
+            <p style="color:var(--text2); font-size:14px; margin-bottom:10px;">@koffi_a · Cotonou, Bénin</p>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <span class="badge badge-purple">🎓 Étudiant</span>
+                <span class="badge badge-green">✅ Vérifié</span>
+            </div>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button class="glass-btn" style="padding:10px 20px;" onclick="uploadProfileAvatar()">
+                📷 Changer photo
+            </button>
+            <button class="glass-btn" style="padding:10px 20px;" onclick="showAlert('Édition du profil')">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                Modifier infos
+            </button>
+        </div>
+    </div>
+        <div class="divider"></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;text-align:center;">
+          <div><div style="font-family:'Sora',sans-serif;font-size:22px;font-weight:700;">142</div><div style="font-size:12.5px;color:var(--text2);">Publications</div></div>
+          <div><div style="font-family:'Sora',sans-serif;font-size:22px;font-weight:700;">1.2k</div><div style="font-size:12.5px;color:var(--text2);">Amis</div></div>
+          <div><div style="font-family:'Sora',sans-serif;font-size:22px;font-weight:700;">3.4k</div><div style="font-size:12.5px;color:var(--text2);">Abonnés</div></div>
+        </div>
+      </div>
+      <div class="profile-info-card" style="margin-bottom:20px;">
+        <h3 style="font-size:15px;font-weight:600;margin-bottom:16px;">Modifier mes informations</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div class="form-group"><label class="form-label">Prénom</label><input class="form-input" value="Koffi"></div>
+          <div class="form-group"><label class="form-label">Nom</label><input class="form-input" value="Agban"></div>
+          <div class="form-group" style="grid-column:1/-1;"><label class="form-label">Bio</label><input class="form-input" value="Étudiant passionné de tech et de culture 🌍" placeholder="Bio..."></div>
+          <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" value="koffi@exemple.com"></div>
+          <div class="form-group"><label class="form-label">Localisation</label><input class="form-input" value="Cotonou, Bénin"></div>
+        </div>
+        <div class="divider"></div>
+        <h3 style="font-size:15px;font-weight:600;margin-bottom:16px;">Changer le mot de passe</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;">
+          <div class="form-group"><label class="form-label">Actuel</label><input class="form-input" type="password" placeholder="••••••••"></div>
+          <div class="form-group"><label class="form-label">Nouveau</label><input class="form-input" type="password" placeholder="••••••••"></div>
+          <div class="form-group"><label class="form-label">Confirmer</label><input class="form-input" type="password" placeholder="••••••••"></div>
+        </div>
+        <button class="glass-btn primary" style="padding:10px 28px;" onclick="updateProfile()">Enregistrer les infos</button>
+        <button class="glass-btn primary" style="padding:10px 28px; margin-top:10px;" onclick="updatePassword()">Changer le mot de passe</button>
+      </div>
+    </div>
+
+    <!-- ══ ADMIN PAGE ══ -->
+    <!-- ══ ADMIN PAGE ══ -->
+<div id="adminPage" class="page">
+    <div class="topbar">
+        <h2 style="font-family:'Sora',sans-serif;font-size:20px;font-weight:700;">Back Office</h2>
+        <div style="display:flex;gap:8px;">
+            <span class="badge badge-purple" id="adminRoleBadge">Administrateur</span>
+            <button class="glass-btn" style="padding:8px 16px;border-radius:var(--radius-sm);" onclick="logout()">Déconnexion</button>
+        </div>
+    </div>
+
+    <!-- Dashboard Stats (dynamique) -->
+    <div class="dash-grid" id="adminStatsContainer">
+        <div class="dash-card">
+            <div class="dash-icon" style="background:rgba(124,111,255,0.2);">👥</div>
+            <div class="dash-num" id="statUsers">0</div>
+            <div class="dash-label">Utilisateurs inscrits</div>
+        </div>
+        <div class="dash-card">
+            <div class="dash-icon" style="background:rgba(16,217,140,0.15);">📝</div>
+            <div class="dash-num" id="statPosts">0</div>
+            <div class="dash-label">Publications</div>
+        </div>
+        <div class="dash-card">
+            <div class="dash-icon" style="background:rgba(255,170,68,0.15);">💬</div>
+            <div class="dash-num" id="statComments">0</div>
+            <div class="dash-label">Commentaires</div>
+        </div>
+        <div class="dash-card">
+            <div class="dash-icon" style="background:rgba(255,85,119,0.15);">❤️</div>
+            <div class="dash-num" id="statLikes">0</div>
+            <div class="dash-label">Likes</div>
+        </div>
+    </div>
+
+    <!-- User table (dynamique) -->
+    <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;">
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+            <h3 style="font-size:15px;font-weight:600;">Gestion des utilisateurs</h3>
+            <button class="glass-btn primary admin-only" style="padding:8px 16px;" onclick="showAddModeratorModal()">+ Ajouter modérateur</button>
+        </div>
+        <div style="overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;">
+                <thead>
+                    <tr style="background:rgba(255,255,255,0.04);">
+                        <th style="text-align:left;padding:12px 20px;font-size:12px;font-weight:600;color:var(--text2);">Utilisateur</th>
+                        <th style="text-align:left;padding:12px 20px;font-size:12px;font-weight:600;color:var(--text2);">Rôle</th>
+                        <th style="text-align:left;padding:12px 20px;font-size:12px;font-weight:600;color:var(--text2);">Statut</th>
+                        <th style="text-align:left;padding:12px 20px;font-size:12px;font-weight:600;color:var(--text2);">Inscrit le</th>
+                        <th style="text-align:left;padding:12px 20px;font-size:12px;font-weight:600;color:var(--text2);">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="adminUsersTable">
+                    <tr><td colspan="5" style="text-align:center; padding:20px;">Chargement...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Posts table (dynamique) -->
+    <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
+            <h3 style="font-size:15px;font-weight:600;">Gestion des publications</h3>
+        </div>
+        <div style="overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;">
+                <thead>
+                    <tr style="background:rgba(255,255,255,0.04);">
+                        <th style="text-align:left;padding:12px 20px;font-size:12px;font-weight:600;color:var(--text2);">Auteur</th>
+                        <th style="text-align:left;padding:12px 20px;font-size:12px;font-weight:600;color:var(--text2);">Contenu</th>
+                        <th style="text-align:center;padding:12px 20px;font-size:12px;font-weight:600;color:var(--text2);">Interactions</th>
+                        <th style="text-align:left;padding:12px 20px;font-size:12px;font-weight:600;color:var(--text2);">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="adminPostsTable">
+                    <tr><td colspan="4" style="text-align:center; padding:20px;">Chargement...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- ══ NOTIFICATIONS PAGE ══ -->
+<div id="notificationsPage" class="page">
+    <div class="topbar">
+        <h2 style="font-family:'Sora',sans-serif;font-size:20px;font-weight:700;">Notifications</h2>
+        <button class="glass-btn" style="padding:8px 16px;" onclick="markAllNotificationsRead()">
+            Tout marquer comme lu
+        </button>
+    </div>
+    <div id="notificationsContainer">
+        <div style="text-align:center; padding:40px; color:var(--text2);">Chargement des notifications...</div>
+    </div>
+</div>
+
+  </div><!-- /feed-area -->
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel" id="rightPanel">
+    <div class="panel-section">
+        <div class="panel-title">Mon résumé</div>
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="stat-num" id="summaryPosts">0</div>
+                <div class="stat-label">Posts</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="summaryFriends">0</div>
+                <div class="stat-label">Amis</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="summaryLikes">0</div>
+                <div class="stat-label">Likes reçus</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="summaryNotifs">0</div>
+                <div class="stat-label">Nouvelles notifs</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-section" id="onlineFriendsSection">
+        <div class="panel-title">Amis en ligne</div>
+        <div id="onlineFriendsList">
+            <!-- Chargé dynamiquement -->
+        </div>
+    </div>
+
+    <div class="panel-section" id="suggestionsSection">
+        <div class="panel-title">Suggestions d'amis</div>
+        <div id="suggestionsList">
+            <!-- Chargé dynamiquement -->
+        </div>
+    </div>
+</div>
+
+</div><!-- /main -->
+
+<!-- ─── FLOATING CHAT ─── -->
+<div class="chat-overlay" id="chatOverlay">
+  <div class="chat-header">
+    <div class="avatar-fallback" style="width:32px;height:32px;font-size:11px;background:linear-gradient(135deg,#ff9966,#ff5577);color:white;flex-shrink:0;">FM</div>
+    <div>
+      <div class="chat-title">Fatime Maïdoukou</div>
+      <div style="font-size:11px;color:var(--success);">En ligne</div>
+    </div>
+    <button class="icon-btn" style="width:28px;height:28px;margin-left:auto;" onclick="toggleChat()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="chat-messages" id="floatChatMsgs">
+    <div class="msg them">T'as vu le coucher de soleil ce soir ? 🌅</div>
+    <div class="msg me">Oui magnifique ! Tu l'as pris en photo ?</div>
+    <div class="msg them">Oui j'ai publié sur mon profil 📸</div>
+  </div>
+  <div class="chat-input-row">
+    <input class="chat-input" id="floatChatInput" placeholder="Message..." onkeydown="sendFloatMsg(event)">
+    <button class="icon-btn" onclick="sendFloatMsg({key:'Enter'})">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ─── TOAST ─── -->
+<div id="toast" style="position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(30,30,50,0.95);backdrop-filter:blur(16px);border:1px solid rgba(124,111,255,0.3);color:var(--text);padding:12px 24px;border-radius:50px;font-size:14px;font-weight:500;z-index:999;opacity:0;transition:all 0.3s ease;pointer-events:none;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,0.4);">
+</div>
+
+<script src="assets/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Test API SocialWave</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #0a0a0f; color: white; }
+        .form-group { margin-bottom: 15px; }
+        input { padding: 8px; width: 250px; border-radius: 5px; border: 1px solid #ccc; }
+        button { padding: 10px 20px; background: #7c6fff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        pre { background: #1a1a26; padding: 15px; border-radius: 8px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test API SocialWave</h1>
+    
+    <div style="display: flex; gap: 40px; flex-wrap: wrap;">
+        <!-- Formulaire d'inscription -->
+        <div style="background: #12121a; padding: 20px; border-radius: 10px;">
+            <h2>📝 Inscription</h2>
+            <div class="form-group">
+                <input type="text" id="reg_nom" placeholder="Nom">
+            </div>
+            <div class="form-group">
+                <input type="text" id="reg_prenom" placeholder="Prénom">
+            </div>
+            <div class="form-group">
+                <input type="email" id="reg_email" placeholder="Email">
+            </div>
+            <div class="form-group">
+                <input type="password" id="reg_password" placeholder="Mot de passe">
+            </div>
+            <div class="form-group">
+                <input type="password" id="reg_confirm" placeholder="Confirmer">
+            </div>
+            <button onclick="testRegister()">S'inscrire</button>
+        </div>
+
+        <!-- Formulaire de connexion -->
+        <div style="background: #12121a; padding: 20px; border-radius: 10px;">
+            <h2>🔐 Connexion</h2>
+            <div class="form-group">
+                <input type="email" id="login_email" placeholder="Email">
+            </div>
+            <div class="form-group">
+                <input type="password" id="login_password" placeholder="Mot de passe">
+            </div>
+            <button onclick="testLogin()">Se connecter</button>
+        </div>
+    </div>
+
+    <h3>📤 Réponse :</h3>
+    <pre id="response">Clique sur un bouton...</pre>
+
+    <script>
+        async function testRegister() {
+            const data = {
+                nom: document.getElementById('reg_nom').value,
+                prenom: document.getElementById('reg_prenom').value,
+                email: document.getElementById('reg_email').value,
+                mot_de_passe: document.getElementById('reg_password').value,
+                confirm_mot_de_passe: document.getElementById('reg_confirm').value
+            };
+
+            document.getElementById('response').innerText = 'Envoi en cours...';
+
+            try {
+                const response = await fetch('http://localhost/social-network/api/auth/register.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                document.getElementById('response').innerText = JSON.stringify(result, null, 2);
+            } catch (error) {
+                document.getElementById('response').innerText = 'Erreur: ' + error.message;
+            }
+        }
+
+        async function testLogin() {
+            const data = {
+                email: document.getElementById('login_email').value,
+                mot_de_passe: document.getElementById('login_password').value
+            };
+
+            document.getElementById('response').innerText = 'Envoi en cours...';
+
+            try {
+                const response = await fetch('http://localhost/social-network/api/auth/login.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                document.getElementById('response').innerText = JSON.stringify(result, null, 2);
+            } catch (error) {
+                document.getElementById('response').innerText = 'Erreur: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
