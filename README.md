@@ -112,11 +112,21 @@ SocialWave est une application web de type réseau social développée dans le c
 - ✅ Gestion des publications
 
 ## 👥 Membres du groupe
+|Membres             |  Rôles               | Partie concernés                    |
+|--------------------|----------------------|-------------------------------------|
+|BACHIROU  Bylgait   |  BACKEND & Frontend  | gestion de Auth & Post Design UI/UX | 
+|SAVINGNONOUGBO Marc |  BACKEND & Frontend  | gestion de Chat & Friends           |  
+|DJOSSOU Thomas      |  BACKEND & Frontend  | gestion de Comment & Porfile        | 
+|BABADOUNDE Billie   |  BACKEND & Frontend  | gestion de Notification & test      |
 
+## Problème rencontrée
 
-BACHIROU  Bylgait | Développeur Backend / Database |
-SAVINGNONOUGBO Marc & DJOSSOU Thomas Développeur Frontend |
-BABADOUNDE Billie Intégrateur / UI Designer  & |
+Pour la réalisation du projet nous étions confronté a un manques d'équipement . Pour 04 étudiants nous n'avons que 2 PC , et le fait que nos amis également étais dans la même condition que nous dans la realisation du projet, nous étions de nous contenté des 02 PC, ce qui ne nous as permis de réalisation la partie github du projet . 
+Raison pour laquelle nous étions obligé de notifié la participation de chacun dans le README.
+
+Veuillez sincerement nous excuser.
+
+##
 
 
 
