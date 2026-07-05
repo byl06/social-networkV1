@@ -126,9 +126,8 @@ Raison pour laquelle nous étions obligé de notifié la participation de chacun
 
 Veuillez sincerement nous excuser.
 
-##
-
-
+## Comment sommes nous organisés?
+Avec les deux PC, chaques jours nous nous reunissons pour travaillez sur le projet et chaque membre s'occupent de faire sa partie au jours le jours.
 
 ## 🎯 Exigences techniques respectées
 
