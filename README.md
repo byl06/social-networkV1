@@ -121,7 +121,7 @@ SocialWave est une application web de type réseau social développée dans le c
 
 ## Problème rencontrée
 
-Pour la réalisation du projet nous étions confronté a un manques d'équipement . Pour 04 étudiants nous n'avons que 2 PC , et le fait que nos amis également étais dans la même condition que nous dans la realisation du projet, nous étions de nous contenté des 02 PC, ce qui ne nous as permis de réalisation la partie github du projet . 
+Pour la réalisation du projet nous étions confronté a un manques d'équipement . Pour 04 étudiants nous n'avons que 2 PC , et le fait que nos amis également étais dans la même condition que nous dans la realisation du projet, nous étions de nous contenté des 02 PC, ce qui ne nous a pas permis de réalisation la partie github du projet . 
 Raison pour laquelle nous étions obligé de notifié la participation de chacun dans le README.
 
 Veuillez sincerement nous excuser.
