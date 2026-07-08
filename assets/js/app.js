@@ -927,6 +927,9 @@ window.showAddModeratorModal = showAddModeratorModal;
 window.openImageUploader = openImageUploader;
 window.uploadProfileAvatar = uploadProfileAvatar;
 window.removeImagePreview = removeImagePreview;
+// À la fin du fichier, après tous les window.xxx
+window.openChatImageUploader = openChatImageUploader;
+window.removeChatImagePreview = removeChatImagePreview;
 // ========== GESTION DES PUBLICATIONS ==========
 
 // Charger les publications depuis l'API
