@@ -1974,7 +1974,6 @@ function displayMessages(messages, isAutoRefresh = false) {
     const container = document.getElementById('convMessages');
     if (!container) return;
     
-    // Sauvegarder la position de défilement
     const wasAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 100;
     
     if (!isAutoRefresh) {
@@ -1982,29 +1981,44 @@ function displayMessages(messages, isAutoRefresh = false) {
     }
     
     if (messages.length === 0) {
-        container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text2);">Aucun message. Envoyez le premier message !</div>';
+        container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text2);">Aucun message</div>';
         return;
     }
     
     const currentUserId = currentUser?.id_user;
     
     const messagesHtml = messages.map(msg => `
-        <div class="msg ${msg.id_sender === currentUserId ? 'me' : 'them'}" style="align-self:${msg.id_sender === currentUserId ? 'flex-end' : 'flex-start'}; max-width:75%; ${msg.id_sender === currentUserId ? 'background:rgba(124,111,255,0.3); border:1px solid rgba(124,111,255,0.4); border-radius:16px 4px 16px 16px; color:#d4cfff;' : 'background:rgba(255,255,255,0.08); border-radius:4px 16px 16px 16px;'} padding:10px 14px; margin-bottom:8px; font-size:13.5px;">
-            ${msg.id_sender !== currentUserId ? `<div style="font-size:11px; color:var(--accent2); margin-bottom:4px;">${escapeHtml(msg.prenom)} ${escapeHtml(msg.nom)}</div>` : ''}
-            <div>${msg.contenu ? escapeHtml(msg.contenu) : ''}</div>
-            ${msg.image ? `<img src="${msg.image}" style="max-width:100%; border-radius:8px; margin-top:5px;">` : ''}
-            <div style="font-size:10px; color:var(--text2); margin-top:4px; text-align:right;">${formatTime(msg.date_envoi)}</div>
+        <div class="msg ${msg.id_sender === currentUserId ? 'me' : 'them'}" 
+             style="align-self:${msg.id_sender === currentUserId ? 'flex-end' : 'flex-start'}; 
+                    max-width:75%; 
+                    ${msg.id_sender === currentUserId ? 
+                        'background:rgba(124,111,255,0.3); border:1px solid rgba(124,111,255,0.4); border-radius:16px 4px 16px 16px; color:#d4cfff;' : 
+                        'background:rgba(255,255,255,0.08); border-radius:4px 16px 16px 16px;'
+                    } 
+                    padding:10px 14px; margin-bottom:8px; font-size:13.5px;">
+            ${msg.id_sender !== currentUserId ? 
+                `<div style="font-size:11px; color:var(--accent2); margin-bottom:4px;">${escapeHtml(msg.prenom)} ${escapeHtml(msg.nom)}</div>` : ''
+            }
+            ${msg.contenu ? `<div>${escapeHtml(msg.contenu)}</div>` : ''}
+            ${msg.image ? `
+                <div style="margin-top:8px; border-radius:8px; overflow:hidden; max-width:200px;">
+                    <img src="http://localhost/social-network/${msg.image}" 
+                         style="width:100%; max-height:200px; object-fit:cover; border-radius:8px; cursor:pointer;" 
+                         onclick="viewFullImage('${msg.image}')">
+                </div>
+            ` : ''}
+            <div style="font-size:10px; color:var(--text2); margin-top:4px; text-align:right;">
+                ${formatTime(msg.date_envoi)}
+            </div>
         </div>
     `).join('');
     
     if (isAutoRefresh) {
-        // En auto-refresh, on met à jour sans tout recharger
         container.innerHTML = messagesHtml;
     } else {
         container.innerHTML = messagesHtml;
     }
     
-    // Défiler vers le bas si c'était déjà en bas
     if (wasAtBottom || !isAutoRefresh) {
         setTimeout(() => {
             container.scrollTop = container.scrollHeight;
@@ -2994,6 +3008,142 @@ async function publishPost() {
         }
     } catch (error) {
         showAlert('Erreur de connexion au serveur');
+    }
+}
+
+// ========== CHAT - ENVOI D'IMAGES ==========
+
+let currentChatImage = null;
+
+// Ouvrir le sélecteur d'image pour le chat
+function openChatImageUploader() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/jpeg,image/png,image/gif,image/webp';
+    
+    input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        // Vérifier la taille
+        if (file.size > 5 * 1024 * 1024) {
+            showAlert('❌ L\'image est trop volumineuse (max 5MB)');
+            return;
+        }
+        
+        // Upload vers le serveur
+        const formData = new FormData();
+        formData.append('image', file);
+        
+        showAlert('📤 Upload en cours...');
+        
+        try {
+            const response = await fetch('http://localhost/social-network/api/chat/upload_image.php', {
+                method: 'POST',
+                credentials: 'include',
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                currentChatImage = data.image_url;
+                showAlert('✅ Image prête à être envoyée !');
+                
+                // Afficher l'aperçu dans le chat
+                showChatImagePreview(data.image_url);
+            } else {
+                showAlert(data.error || 'Erreur upload');
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+            showAlert('Erreur de connexion');
+        }
+    };
+    
+    input.click();
+}
+
+// Afficher l'aperçu de l'image dans le chat
+function showChatImagePreview(imageUrl) {
+    let previewDiv = document.getElementById('chatImagePreview');
+    if (!previewDiv) {
+        const inputRow = document.querySelector('#convWindow .chat-input-row');
+        previewDiv = document.createElement('div');
+        previewDiv.id = 'chatImagePreview';
+        previewDiv.style.cssText = 'padding:8px 12px; background:rgba(255,255,255,0.04); border-radius:8px; margin-bottom:8px; display:flex; align-items:center; gap:12px;';
+        inputRow.parentNode.insertBefore(previewDiv, inputRow);
+    }
+    
+    previewDiv.innerHTML = `
+        <img src="http://localhost/social-network/${imageUrl}" style="max-height:60px; max-width:60px; border-radius:8px; object-fit:cover;">
+        <span style="font-size:13px; color:#8888aa;">Image prête à être envoyée</span>
+        <button onclick="removeChatImagePreview()" style="background:none; border:none; color:#ff5577; cursor:pointer; font-size:18px; margin-left:auto;">✕</button>
+    `;
+    previewDiv.style.display = 'flex';
+}
+
+// Supprimer l'aperçu de l'image
+function removeChatImagePreview() {
+    currentChatImage = null;
+    const preview = document.getElementById('chatImagePreview');
+    if (preview) {
+        preview.style.display = 'none';
+        preview.innerHTML = '';
+    }
+}
+
+// Modifier sendMessage pour envoyer aussi l'image
+async function sendMessage() {
+    const input = document.getElementById('chatInlineInput');
+    const contenu = input.value.trim();
+    
+    // Vérifier qu'il y a du texte OU une image
+    if (!contenu && !currentChatImage) {
+        showAlert('✏️ Écrivez un message ou ajoutez une image');
+        return;
+    }
+    
+    if (!currentConversationId) {
+        showAlert('Sélectionnez une conversation');
+        return;
+    }
+    
+    input.disabled = true;
+    
+    try {
+        const payload = {
+            conversation_id: currentConversationId,
+            contenu: contenu || null,
+            image: currentChatImage || null
+        };
+        
+        const response = await fetch('http://localhost/social-network/api/chat/send_message.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(payload)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            input.value = '';
+            // Supprimer l'aperçu
+            removeChatImagePreview();
+            currentChatImage = null;
+            // Recharger les messages
+            await loadMessages(currentConversationId);
+            // Recharger les conversations
+            loadConversations();
+        } else {
+            showAlert(data.error || 'Erreur');
+        }
+    } catch (error) {
+        showAlert('Erreur de connexion');
+    } finally {
+        input.disabled = false;
+        input.focus();
     }
 }
 
